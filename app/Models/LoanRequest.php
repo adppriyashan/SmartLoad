@@ -20,7 +20,7 @@ class LoanRequest extends Model
         'active_loans_count',
         'nic_copy',
         'salary_slips',
-        'bank_statement',
+        'bank_statements',
         'employment_letter',
         'optional_uploads',
         'status'
@@ -28,6 +28,7 @@ class LoanRequest extends Model
 
     protected $casts = [
         'salary_slips' => 'json',
+        'bank_statements' => 'json',
         'optional_uploads' => 'json',
     ];
 

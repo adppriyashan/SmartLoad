@@ -145,15 +145,6 @@
                         </li>
                         <li class="list-group-item border-0 d-flex align-items-center px-0 mb-2">
                             <div class="avatar avatar-sm me-3 bg-gradient-dark shadow-dark border-radius-md">
-                                <i class="fas fa-university text-white"></i>
-                            </div>
-                            <div class="d-flex align-items-start flex-column justify-content-center">
-                                <h6 class="mb-0 text-sm">Bank Statement</h6>
-                                <a href="{{ asset('storage/' . $loan->bank_statement) }}" target="_blank" class="text-xs text-primary font-weight-bold">View Document</a>
-                            </div>
-                        </li>
-                        <li class="list-group-item border-0 d-flex align-items-center px-0 mb-2">
-                            <div class="avatar avatar-sm me-3 bg-gradient-dark shadow-dark border-radius-md">
                                 <i class="fas fa-briefcase text-white"></i>
                             </div>
                             <div class="d-flex align-items-start flex-column justify-content-center">
@@ -163,6 +154,18 @@
                         </li>
                     </ul>
                     
+                    @if($loan->bank_statements)
+                    <hr class="horizontal dark my-3">
+                    <h6 class="text-xs font-weight-bold text-uppercase text-secondary mb-3">Bank Statements</h6>
+                    <div class="d-flex flex-wrap">
+                        @foreach($loan->bank_statements as $index => $statement)
+                        <a href="{{ asset('storage/' . $statement) }}" target="_blank" class="btn btn-sm btn-outline-info me-2 mb-2">
+                            Statement {{ $index + 1 }}
+                        </a>
+                        @endforeach
+                    </div>
+                    @endif
+
                     @if($loan->salary_slips)
                     <hr class="horizontal dark my-3">
                     <h6 class="text-xs font-weight-bold text-uppercase text-secondary mb-3">Salary Slips</h6>
@@ -174,6 +177,28 @@
                         @endforeach
                     </div>
                     @endif
+
+                    <hr class="horizontal dark my-3">
+                    <h6 class="text-xs font-weight-bold text-uppercase text-secondary mb-3">Guarantor Documents</h6>
+                    @foreach($loan->guarantors as $index => $guarantor)
+                    <div class="mb-3">
+                        <p class="text-xs font-weight-bold mb-1">Guarantor {{ $index + 1 }}:</p>
+                        <div class="d-flex flex-wrap">
+                            @if($guarantor->nic_copy)
+                            <a href="{{ asset('storage/' . $guarantor->nic_copy) }}" target="_blank" class="btn btn-xs btn-link text-primary ps-0 mb-0">
+                                <i class="fas fa-id-card me-1"></i> NIC Copy
+                            </a>
+                            @endif
+                            @if($guarantor->salary_slips)
+                                @foreach($guarantor->salary_slips as $sIndex => $gSlip)
+                                <a href="{{ asset('storage/' . $gSlip) }}" target="_blank" class="btn btn-xs btn-link text-primary mb-0">
+                                    <i class="fas fa-file-invoice-dollar me-1"></i> Slip {{ $sIndex + 1 }}
+                                </a>
+                                @endforeach
+                            @endif
+                        </div>
+                    </div>
+                    @endforeach
                 </div>
             </div>
 

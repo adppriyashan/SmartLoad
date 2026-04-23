@@ -50,7 +50,7 @@ class LoanRequestController extends Controller
             'gross_salary' => 'required|numeric|gte:basic_salary',
             'nic_copy' => 'required|file',
             'salary_slips.*' => 'file',
-            'bank_statement' => 'required|file',
+            'bank_statements.*' => 'file',
             'employment_letter' => 'required|file',
         ]);
 
@@ -65,9 +65,6 @@ class LoanRequestController extends Controller
         if ($request->hasFile('nic_copy')) {
             $data['nic_copy'] = $request->file('nic_copy')->store('loans/nic', 'public');
         }
-        if ($request->hasFile('bank_statement')) {
-            $data['bank_statement'] = $request->file('bank_statement')->store('loans/bank', 'public');
-        }
         if ($request->hasFile('employment_letter')) {
             $data['employment_letter'] = $request->file('employment_letter')->store('loans/employment', 'public');
         }
@@ -78,6 +75,14 @@ class LoanRequestController extends Controller
                 $slips[] = $file->store('loans/salaries', 'public');
             }
             $data['salary_slips'] = $slips;
+        }
+
+        if ($request->hasFile('bank_statements')) {
+            $statements = [];
+            foreach ($request->file('bank_statements') as $file) {
+                $statements[] = $file->store('loans/bank', 'public');
+            }
+            $data['bank_statements'] = $statements;
         }
 
         $loan = LoanRequest::create($data);

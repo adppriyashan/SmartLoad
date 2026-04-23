@@ -165,8 +165,8 @@
                                             required>
                                     </div>
                                     <div class="col-md-6 mb-3">
-                                        <label class="form-control-label">Bank Statement (Last 3-6 months)</label>
-                                        <input type="file" name="bank_statement" class="form-control" required>
+                                        <label class="form-control-label">Bank Statements (Last 3-6 months)</label>
+                                        <input type="file" name="bank_statements[]" class="form-control" multiple required>
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <label class="form-control-label">Employment Letter</label>
@@ -364,6 +364,11 @@
                 return valid;
             }
 
+            // Counters for dynamic rows to ensure correct indexing
+            let incomeIndex = 0;
+            let commitmentIndex = 0;
+            let expenseIndex = 0;
+
             // Dynamic Income Rows
             function addOtherIncomeRow() {
                 let container = document.getElementById("other-incomes-container");
@@ -372,11 +377,11 @@
                 row.innerHTML = `
             <div class="col-md-5">
                 <label class="text-xs">Income Name</label>
-                <input type="text" name="other_incomes[][name]" class="form-control form-control-sm" placeholder="e.g. Rent">
+                <input type="text" name="other_incomes[${incomeIndex}][name]" class="form-control form-control-sm" placeholder="e.g. Rent">
             </div>
             <div class="col-md-5">
                 <label class="text-xs">Amount (LKR)</label>
-                <input type="number" name="other_incomes[][amount]" class="form-control form-control-sm income-calc" oninput="updateTotals()">
+                <input type="number" name="other_incomes[${incomeIndex}][amount]" class="form-control form-control-sm income-calc" oninput="updateTotals()">
             </div>
             <div class="col-md-2">
                 <button type="button" class="btn btn-md btn-link text-danger mb-0" onclick="this.closest('.row').remove(); updateTotals();">
@@ -385,6 +390,7 @@
             </div>
         `;
                 container.appendChild(row);
+                incomeIndex++;
             }
 
             // Dynamic Commitments Rows
@@ -395,11 +401,11 @@
                 row.innerHTML = `
             <div class="col-md-5">
                 <label class="text-xs">Commitment Name</label>
-                <input type="text" name="financial_commitments[][name]" class="form-control form-control-sm" placeholder="e.g. Car Loan">
+                <input type="text" name="financial_commitments[${commitmentIndex}][name]" class="form-control form-control-sm" placeholder="e.g. Car Loan">
             </div>
             <div class="col-md-5">
                 <label class="text-xs">Amount (LKR)</label>
-                <input type="number" name="financial_commitments[][amount]" class="form-control form-control-sm commitment-calc" oninput="updateTotals()">
+                <input type="number" name="financial_commitments[${commitmentIndex}][amount]" class="form-control form-control-sm commitment-calc" oninput="updateTotals()">
             </div>
             <div class="col-md-2">
                 <button type="button" class="btn btn-md btn-link text-danger mb-0" onclick="this.closest('.row').remove(); updateTotals();">
@@ -408,6 +414,7 @@
             </div>
         `;
                 container.appendChild(row);
+                commitmentIndex++;
             }
 
             // Dynamic Expense Rows
@@ -418,11 +425,11 @@
                 row.innerHTML = `
             <div class="col-md-5">
                 <label class="text-xs">Expense Name</label>
-                <input type="text" name="personal_expenses[][name]" class="form-control form-control-sm" placeholder="e.g. Food">
+                <input type="text" name="personal_expenses[${expenseIndex}][name]" class="form-control form-control-sm" placeholder="e.g. Food">
             </div>
             <div class="col-md-5">
                 <label class="text-xs">Amount (LKR)</label>
-                <input type="number" name="personal_expenses[][amount]" class="form-control form-control-sm expense-calc" oninput="updateTotals()">
+                <input type="number" name="personal_expenses[${expenseIndex}][amount]" class="form-control form-control-sm expense-calc" oninput="updateTotals()">
             </div>
             <div class="col-md-2">
                 <button type="button" class="btn btn-md btn-link text-danger mb-0" onclick="this.closest('.row').remove(); updateTotals();">
@@ -431,6 +438,7 @@
             </div>
         `;
                 container.appendChild(row);
+                expenseIndex++;
             }
 
             function updateTotals() {

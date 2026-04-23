@@ -30,8 +30,8 @@ return new class extends Migration
 
             // Step 4: Required Uploads
             $table->string('nic_copy')->nullable();
-            $table->json('salary_slips')->nullable(); // Still JSON as it's just paths
-            $table->string('bank_statement')->nullable();
+            $table->json('salary_slips')->nullable(); // Multiple slips
+            $table->json('bank_statements')->nullable(); // Multiple statements
             $table->string('employment_letter')->nullable();
             $table->json('optional_uploads')->nullable();
 
