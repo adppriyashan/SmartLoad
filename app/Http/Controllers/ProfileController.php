@@ -16,6 +16,11 @@ class ProfileController extends Controller
         return view('auth.profile-completion');
     }
 
+    public function show()
+    {
+        return view('profile.show', ['user' => Auth::user()]);
+    }
+
     public function updateProfile(Request $request)
     {
         $request->validate([
@@ -30,7 +35,7 @@ class ProfileController extends Controller
 
         $nic = $request->nic;
         $dob = Carbon::parse($request->dob);
-        
+
         // NIC Validation logic
         if (!$this->validateNIC($nic, $dob)) {
             return back()->withErrors(['nic' => 'The NIC does not match your Date of Birth or is invalid.'])->withInput();
@@ -71,27 +76,29 @@ class ProfileController extends Controller
 
         if (strlen($nic) == 10 && (substr($nic, -1) == 'V' || substr($nic, -1) == 'X')) {
             // Old NIC
-            $year = 1900 + (int)substr($nic, 0, 2);
-            $days = (int)substr($nic, 2, 3);
+            $year = 1900 + (int) substr($nic, 0, 2);
+            $days = (int) substr($nic, 2, 3);
         } elseif (strlen($nic) == 12 && is_numeric($nic)) {
             // New NIC
-            $year = (int)substr($nic, 0, 4);
-            $days = (int)substr($nic, 4, 3);
+            $year = (int) substr($nic, 0, 4);
+            $days = (int) substr($nic, 4, 3);
         } else {
             return false;
         }
 
-        if ($days > 500) $days -= 500;
+        if ($days > 500)
+            $days -= 500;
 
         // Check if year matches
-        if ($year != $dob->year) return false;
+        if ($year != $dob->year)
+            return false;
 
         // Check if day of year matches
         // Note: Sri Lankan NIC uses a slightly different day counting for Leap years sometimes, 
         // but generally it matches the day of the year.
         // We'll calculate the day of the year for the given DOB.
         $dobDayOfYear = $dob->dayOfYear;
-        
+
         // There is a known issue with Feb 29 in NICs. 
         // If it's a leap year and date is after Feb 28, some systems offset by 1.
         // However, most standard validations use a simple check.

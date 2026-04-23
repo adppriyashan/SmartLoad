@@ -4,8 +4,20 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-class HomeController extends Controller
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+
+class HomeController extends Controller implements HasMiddleware
 {
+    /**
+     * Get the middleware that should be assigned to the controller.
+     */
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('auth'),
+        ];
+    }
     /**
      * Create a new controller instance.
      *
@@ -13,7 +25,7 @@ class HomeController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth');
+        //
     }
 
     /**
@@ -23,6 +35,9 @@ class HomeController extends Controller
      */
     public function index()
     {
+        if (auth()->user()->role === 'admin') {
+            return redirect()->route('admin.dashboard');
+        }
         return view('home');
     }
 }

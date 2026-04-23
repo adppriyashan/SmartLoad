@@ -5,8 +5,20 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\ConfirmsPasswords;
 
-class ConfirmPasswordController extends Controller
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+
+class ConfirmPasswordController extends Controller implements HasMiddleware
 {
+    /**
+     * Get the middleware that should be assigned to the controller.
+     */
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('auth'),
+        ];
+    }
     /*
     |--------------------------------------------------------------------------
     | Confirm Password Controller
@@ -34,6 +46,6 @@ class ConfirmPasswordController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth');
+        //
     }
 }
