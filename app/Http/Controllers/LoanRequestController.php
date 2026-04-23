@@ -13,12 +13,20 @@ use Illuminate\Support\Facades\Storage;
 
 class LoanRequestController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $loans = LoanRequest::with(['guarantors', 'incomes', 'commitments', 'expenses'])
-            ->where('user_id', Auth::id())
-            ->latest()
-            ->get();
+        $query = LoanRequest::with(['guarantors', 'incomes', 'commitments', 'expenses'])
+            ->where('user_id', Auth::id());
+
+        if ($request->filled('from_date')) {
+            $query->whereDate('created_at', '>=', $request->from_date);
+        }
+
+        if ($request->filled('to_date')) {
+            $query->whereDate('created_at', '<=', $request->to_date);
+        }
+
+        $loans = $query->latest()->get();
         return view('loans.index', compact('loans'));
     }
 

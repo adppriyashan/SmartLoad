@@ -2,12 +2,50 @@
 
 @section('content')
     <div class="container-fluid py-4">
+        <!-- Filters Section -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card shadow-sm border-radius-xl">
+                    <div class="card-body p-3">
+                        <div class="row align-items-center">
+                            <div class="col-md-4">
+                                <h6 class="mb-0">Filter Records</h6>
+                                <p class="text-xs text-secondary mb-0">Search by application date range</p>
+                            </div>
+                            <div class="col-md-8">
+                                <form method="GET" action="{{ route('loans.index') }}" class="row g-2 align-items-end justify-content-md-end">
+                                    <div class="col-md-3">
+                                        <label class="text-xs font-weight-bold mb-1">From Date</label>
+                                        <input type="date" name="from_date" class="form-control form-control-sm border-radius-md" value="{{ request('from_date') }}">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="text-xs font-weight-bold mb-1">To Date</label>
+                                        <input type="date" name="to_date" class="form-control form-control-sm border-radius-md" value="{{ request('to_date') }}">
+                                    </div>
+                                    <div class="col-auto">
+                                        <button type="submit" class="btn btn-sm bg-gradient-primary mb-0 border-radius-md px-3">
+                                            <i class="fas fa-filter me-1"></i> Apply
+                                        </button>
+                                        @if(request()->hasAny(['from_date', 'to_date']))
+                                            <a href="{{ route('loans.index') }}" class="btn btn-sm btn-link text-danger mb-0 px-2">
+                                                <i class="fas fa-times me-1"></i> Clear
+                                            </a>
+                                        @endif
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="row">
             <div class="col-12">
                 <div class="card mb-4">
                     <div class="card-header pb-0 d-flex justify-content-between align-items-center">
                         <h6>My Loan Requests</h6>
-                        <a href="{{ route('loans.request') }}" class="btn btn-sm bg-gradient-primary">
+                        <a href="{{ route('loans.request') }}" class="btn btn-sm bg-gradient-primary mb-0">
                             <i class="fas fa-plus me-2"></i> New Request
                         </a>
                     </div>
