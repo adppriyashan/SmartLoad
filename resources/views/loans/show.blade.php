@@ -16,13 +16,40 @@
                                 <span class="badge badge-sm bg-gradient-success">Verified</span>
                             @elseif($loan->status == 'Rejected')
                                 <span class="badge badge-sm bg-gradient-danger">Rejected</span>
+                            @elseif($loan->status == 'In Progress')
+                                <span class="badge badge-sm bg-gradient-warning">In Progress</span>
                             @else
                                 <span class="badge badge-sm bg-gradient-info">Under Verification</span>
                             @endif
                         </div>
                     </div>
+                    
+                    @if(Auth::user()->role === 'admin')
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <div class="bg-gray-100 p-3 border-radius-lg d-flex justify-content-between align-items-center">
+                                <span class="text-sm font-weight-bold">Change Status:</span>
+                                <form action="{{ route('loans.updateStatus', $loan->id) }}" method="POST" class="d-flex align-items-center mb-0">
+                                    @csrf
+                                    <select name="status" class="form-select form-select-sm me-2" style="width: 150px;">
+                                        <option value="In Progress" {{ $loan->status == 'In Progress' ? 'selected' : '' }}>In Progress</option>
+                                        <option value="Verified" {{ $loan->status == 'Verified' ? 'selected' : '' }}>Verified</option>
+                                        <option value="Rejected" {{ $loan->status == 'Rejected' ? 'selected' : '' }}>Rejected</option>
+                                    </select>
+                                    <button type="submit" class="btn btn-sm bg-gradient-dark mb-0">Update</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
                 </div>
                 <div class="card-body p-3">
+                    @if(session('success'))
+                        <div class="alert alert-success text-white alert-dismissible fade show" role="alert">
+                            <span class="text-sm">{{ session('success') }}</span>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    @endif
                     <div class="row">
                         <div class="col-md-4 text-center">
                             <h2 class="font-weight-bolder text-dark mb-0">LKR {{ number_format($loan->loan_amount, 2) }}</h2>

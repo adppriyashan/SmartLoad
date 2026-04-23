@@ -64,35 +64,46 @@
                         <span class="nav-link-text ms-1">Dashboard</span>
                     </a>
                 </li>
+                @if (Auth::user()->role !== 'admin')
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->is('loans/request') ? 'active' : '' }}"
+                            href="{{ route('loans.request') }}">
+                            <div
+                                class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
+                                <i
+                                    class="fas fa-file-invoice-dollar {{ request()->is('loans/request') ? 'text-white' : 'text-dark' }}"></i>
+                            </div>
+                            <span class="nav-link-text ms-1">Loan Request</span>
+                        </a>
+                    </li>
+                @endif
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->is('loans/request') ? 'active' : '' }}" href="{{ route('loans.request') }}">
-                        <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
-                            <i class="fas fa-file-invoice-dollar {{ request()->is('loans/request') ? 'text-white' : 'text-dark' }}"></i>
+                    <a class="nav-link {{ request()->is('loans/my-loans') ? 'active' : '' }}"
+                        href="{{ route('loans.index') }}">
+                        <div
+                            class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
+                            <i
+                                class="fas fa-list-ul {{ request()->is('loans/my-loans') ? 'text-white' : 'text-dark' }}"></i>
                         </div>
-                        <span class="nav-link-text ms-1">Loan Request</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->is('loans/my-loans') ? 'active' : '' }}" href="{{ route('loans.index') }}">
-                        <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
-                            <i class="fas fa-list-ul {{ request()->is('loans/my-loans') ? 'text-white' : 'text-dark' }}"></i>
-                        </div>
-                        <span class="nav-link-text ms-1">My Loans</span>
+                        <span
+                            class="nav-link-text ms-1">{{ Auth::user()->role === 'admin' ? 'All Loans' : 'My Loans' }}</span>
                     </a>
                 </li>
                 <li class="nav-item mt-3">
                     <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Account</h6>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->is('profile') ? 'active' : '' }}"
-                        href="{{ route('profile.show') }}">
-                        <div
-                            class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
-                            <i class="fas fa-user {{ request()->is('profile') ? 'text-white' : 'text-dark' }}"></i>
-                        </div>
-                        <span class="nav-link-text ms-1">Profile</span>
-                    </a>
-                </li>
+                @if (Auth::user()->role !== 'admin')
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->is('profile') ? 'active' : '' }}"
+                            href="{{ route('profile.show') }}">
+                            <div
+                                class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
+                                <i class="fas fa-user {{ request()->is('profile') ? 'text-white' : 'text-dark' }}"></i>
+                            </div>
+                            <span class="nav-link-text ms-1">Profile</span>
+                        </a>
+                    </li>
+                @endif
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('logout') }}"
                         onclick="event.preventDefault(); document.getElementById('logout-form').submit();">

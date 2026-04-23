@@ -15,8 +15,20 @@ class LoanRequestController extends Controller
 {
     public function index(Request $request)
     {
-        $query = LoanRequest::with(['guarantors', 'incomes', 'commitments', 'expenses'])
-            ->where('user_id', Auth::id());
+        $isAdmin = Auth::user()->role === 'admin';
+
+        $query = LoanRequest::with(['user', 'guarantors', 'incomes', 'commitments', 'expenses']);
+
+        if (!$isAdmin) {
+            $query->where('user_id', Auth::id());
+        }
+
+        // Search by NIC (Join with users table)
+        if ($request->filled('nic')) {
+            $query->whereHas('user', function($q) use ($request) {
+                $q->where('nic', 'like', '%' . $request->nic . '%');
+            });
+        }
 
         if ($request->filled('from_date')) {
             $query->whereDate('created_at', '>=', $request->from_date);
@@ -26,28 +38,59 @@ class LoanRequestController extends Controller
             $query->whereDate('created_at', '<=', $request->to_date);
         }
 
-        $loans = $query->latest()->get();
-        return view('loans.index', compact('loans'));
+        // Sorting: 'Submitted for verification' status first, then latest
+        $loans = $query->orderByRaw("CASE WHEN status = 'Submitted for verification' THEN 0 ELSE 1 END")
+            ->latest()
+            ->get();
+
+        return view('loans.index', compact('loans', 'isAdmin'));
     }
 
     public function show(LoanRequest $loan)
     {
-        // Ensure user can only view their own loans
-        if ($loan->user_id !== Auth::id()) {
+        // Ensure user can only view their own loans, unless they are admin
+        if (Auth::user()->role !== 'admin' && $loan->user_id !== Auth::id()) {
             abort(403);
         }
 
-        $loan->load(['guarantors', 'incomes', 'commitments', 'expenses']);
+        // Automatically change status to 'In Progress' if admin views a newly submitted loan
+        if (Auth::user()->role === 'admin' && $loan->status === 'Submitted for verification') {
+            $loan->update(['status' => 'In Progress']);
+        }
+
+        $loan->load(['user', 'guarantors', 'incomes', 'commitments', 'expenses']);
         return view('loans.show', compact('loan'));
+    }
+
+    public function updateStatus(Request $request, LoanRequest $loan)
+    {
+        if (Auth::user()->role !== 'admin') {
+            abort(403);
+        }
+
+        $request->validate([
+            'status' => 'required|in:Verified,Rejected,In Progress'
+        ]);
+
+        $loan->update(['status' => $request->status]);
+
+        return redirect()->back()->with('success', 'Loan status updated successfully to ' . $request->status);
     }
 
     public function create()
     {
+        if (Auth::user()->role === 'admin') {
+            return redirect()->route('loans.index')->with('error', 'Administrators cannot apply for loans.');
+        }
         return view('loans.request');
     }
 
     public function store(Request $request)
     {
+        if (Auth::user()->role === 'admin') {
+            return redirect()->route('loans.index')->with('error', 'Administrators cannot apply for loans.');
+        }
+
         // Validation
         $request->validate([
             'loan_type' => 'required',

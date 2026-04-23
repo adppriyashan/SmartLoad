@@ -15,10 +15,14 @@
                             <div class="col-md-8">
                                 <form method="GET" action="{{ route('loans.index') }}" class="row g-2 align-items-end justify-content-md-end">
                                     <div class="col-md-3">
+                                        <label class="text-xs font-weight-bold mb-1">NIC Search</label>
+                                        <input type="text" name="nic" class="form-control form-control-sm border-radius-md" placeholder="Enter NIC..." value="{{ request('nic') }}">
+                                    </div>
+                                    <div class="col-md-2">
                                         <label class="text-xs font-weight-bold mb-1">From Date</label>
                                         <input type="date" name="from_date" class="form-control form-control-sm border-radius-md" value="{{ request('from_date') }}">
                                     </div>
-                                    <div class="col-md-3">
+                                    <div class="col-md-2">
                                         <label class="text-xs font-weight-bold mb-1">To Date</label>
                                         <input type="date" name="to_date" class="form-control form-control-sm border-radius-md" value="{{ request('to_date') }}">
                                     </div>
@@ -26,7 +30,7 @@
                                         <button type="submit" class="btn btn-sm bg-gradient-primary mb-0 border-radius-md px-3">
                                             <i class="fas fa-filter me-1"></i> Apply
                                         </button>
-                                        @if(request()->hasAny(['from_date', 'to_date']))
+                                        @if(request()->hasAny(['from_date', 'to_date', 'nic']))
                                             <a href="{{ route('loans.index') }}" class="btn btn-sm btn-link text-danger mb-0 px-2">
                                                 <i class="fas fa-times me-1"></i> Clear
                                             </a>
@@ -44,17 +48,22 @@
             <div class="col-12">
                 <div class="card mb-4">
                     <div class="card-header pb-0 d-flex justify-content-between align-items-center">
-                        <h6>My Loan Requests</h6>
+                        <h6>{{ $isAdmin ? 'All Loan Requests' : 'My Loan Requests' }}</h6>
+                        @if(!$isAdmin)
                         <a href="{{ route('loans.request') }}" class="btn btn-sm bg-gradient-primary mb-0">
                             <i class="fas fa-plus me-2"></i> New Request
                         </a>
+                        @endif
                     </div>
                     <div class="card-body px-0 pt-0 pb-2">
                         <div class="table-responsive p-0">
                             <table class="table align-items-center mb-0">
                                 <thead>
                                     <tr>
-                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Loan
+                                        @if($isAdmin)
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Applied By</th>
+                                        @endif
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Loan
                                             Type</th>
                                         <th
                                             class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
@@ -71,14 +80,26 @@
                                 <tbody>
                                     @forelse($loans as $loan)
                                         <tr>
+                                            @if($isAdmin)
                                             <td>
                                                 <div class="d-flex px-2 py-1">
+                                                    <div class="d-flex flex-column justify-content-center">
+                                                        <h6 class="mb-0 text-sm">{{ $loan->user->name }}</h6>
+                                                        <p class="text-xs text-secondary mb-0">NIC: {{ $loan->user->nic }}</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            @endif
+                                            <td>
+                                                <div class="d-flex px-2 py-1">
+                                                    @if(!$isAdmin)
                                                     <div>
                                                         <div
                                                             class="avatar avatar-sm me-3 bg-gradient-faded-info border-radius-md text-center">
                                                             <i class="fas fa-hand-holding-usd text-white pt-2"></i>
                                                         </div>
                                                     </div>
+                                                    @endif
                                                     <div class="d-flex flex-column justify-content-center">
                                                         <h6 class="mb-0 text-sm">{{ $loan->loan_type }}</h6>
                                                         <p class="text-xs text-secondary mb-0">Tenure:

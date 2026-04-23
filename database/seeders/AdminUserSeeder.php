@@ -13,11 +13,14 @@ class AdminUserSeeder extends Seeder
     public function run(): void
     {
         \App\Models\User::create([
-            'name' => 'Admin User',
+            'name' => 'System Admin',
             'email' => 'admin@smartload.com',
             'password' => \Illuminate\Support\Facades\Hash::make('admin123'),
             'role' => 'admin',
-            'is_profile_complete' => true, // Admins don't need to complete profile for testing
+            'nic' => '880000000V',
+            'dob' => '1988-01-01',
+            'address' => 'Main Office, SmartLoad HQ',
+            'is_profile_complete' => true,
         ]);
     }
 }
