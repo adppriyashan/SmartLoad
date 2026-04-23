@@ -25,7 +25,7 @@ class ProfileController extends Controller
     {
         $request->validate([
             'customer_name' => 'required|string|max:255',
-            'nic' => 'required|string|max:12',
+            'nic' => 'required|string|max:12|unique:users,nic,' . Auth::id(),
             'address' => 'required|string',
             'tel' => 'required|string|max:20',
             'dob' => 'required|date',
@@ -65,7 +65,11 @@ class ProfileController extends Controller
 
         $user->update($userData);
 
-        return redirect()->route('home')->with('status', 'Profile completed successfully!');
+        if ($request->routeIs('profile.complete')) {
+            return redirect()->route('home')->with('status', 'Profile completed successfully!');
+        }
+
+        return redirect()->back()->with('status', 'Profile updated successfully!');
     }
 
     private function validateNIC($nic, $dob)
