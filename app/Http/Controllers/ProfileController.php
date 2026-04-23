@@ -65,11 +65,7 @@ class ProfileController extends Controller
 
         $user->update($userData);
 
-        if ($request->routeIs('profile.complete')) {
-            return redirect()->route('home')->with('status', 'Profile completed successfully!');
-        }
-
-        return redirect()->back()->with('status', 'Profile updated successfully!');
+        return redirect()->route('home')->with('status', 'Profile completed successfully!');
     }
 
     private function validateNIC($nic, $dob)

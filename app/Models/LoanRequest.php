@@ -17,10 +17,7 @@ class LoanRequest extends Model
         'employment_status',
         'basic_salary',
         'gross_salary',
-        'other_incomes',
         'active_loans_count',
-        'financial_commitments',
-        'personal_expenses',
         'nic_copy',
         'salary_slips',
         'bank_statement',
@@ -30,9 +27,6 @@ class LoanRequest extends Model
     ];
 
     protected $casts = [
-        'other_incomes' => 'json',
-        'financial_commitments' => 'json',
-        'personal_expenses' => 'json',
         'salary_slips' => 'json',
         'optional_uploads' => 'json',
     ];
@@ -45,5 +39,20 @@ class LoanRequest extends Model
     public function guarantors()
     {
         return $this->hasMany(Guarantor::class);
+    }
+
+    public function incomes()
+    {
+        return $this->hasMany(LoanIncome::class);
+    }
+
+    public function commitments()
+    {
+        return $this->hasMany(LoanCommitment::class);
+    }
+
+    public function expenses()
+    {
+        return $this->hasMany(LoanExpense::class);
     }
 }

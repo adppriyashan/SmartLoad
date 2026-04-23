@@ -15,8 +15,8 @@
                             <div class="col-12">
                                 <div class="progress-wrapper mx-auto" style="max-width: 800px;">
                                     <div class="progress" style="height: 4px;">
-                                        <div id="progress-bar" class="progress-bar bg-gradient-primary w-15"
-                                            role="progressbar"></div>
+                                        <div id="progress-bar" class="progress-bar bg-gradient-primary"
+                                            role="progressbar" style="width: 16.66%;"></div>
                                     </div>
                                     <div
                                         class="d-flex justify-content-between mt-3 text-xs font-weight-bold text-uppercase">
@@ -140,8 +140,14 @@
                                 </button>
 
                                 <div class="alert alert-warning text-white border-0 shadow-none">
-                                    <h6 class="text-white mb-0">Total Monthly Expenses: <span
-                                            id="total-expenses-display">LKR0</span></h6>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <h6 class="text-white mb-0">Total Monthly Commitments:</h6>
+                                        <h6 class="text-white mb-0" id="total-commitments-display">LKR0</h6>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <h6 class="text-white mb-0">Total Monthly Expenses:</h6>
+                                        <h6 class="text-white mb-0" id="total-expenses-display">LKR0</h6>
+                                    </div>
                                 </div>
                             </div>
 
@@ -299,7 +305,9 @@
 
                 // Progress bar
                 let progress = (n / totalSteps) * 100;
-                document.getElementById("progress-bar").style.width = progress + "%";
+                let progressBar = document.getElementById("progress-bar");
+                progressBar.style.width = progress + "%";
+                progressBar.setAttribute("aria-valuenow", progress);
 
                 // Nav buttons
                 if (n == 1) {
@@ -337,6 +345,22 @@
                         input.classList.remove("is-invalid");
                     }
                 });
+
+                // Salary validation in Step 2
+                if (currentStep === 2) {
+                    let basic = parseFloat(document.getElementById("basic_salary").value) || 0;
+                    let gross = parseFloat(document.getElementById("gross_salary").value) || 0;
+                    let grossInput = document.getElementById("gross_salary");
+                    
+                    if (gross < basic) {
+                        grossInput.classList.add("is-invalid");
+                        valid = false;
+                        // Optional: Show a message or alert
+                    } else {
+                        grossInput.classList.remove("is-invalid");
+                    }
+                }
+
                 return valid;
             }
 
@@ -375,7 +399,7 @@
             </div>
             <div class="col-md-5">
                 <label class="text-xs">Amount (LKR)</label>
-                <input type="number" name="financial_commitments[][amount]" class="form-control form-control-sm expense-calc" oninput="updateTotals()">
+                <input type="number" name="financial_commitments[][amount]" class="form-control form-control-sm commitment-calc" oninput="updateTotals()">
             </div>
             <div class="col-md-2">
                 <button type="button" class="btn btn-md btn-link text-danger mb-0" onclick="this.closest('.row').remove(); updateTotals();">
@@ -421,6 +445,14 @@
                 });
                 document.getElementById("total-income-display").innerText = "LKR" + totalIncome.toLocaleString();
 
+                // Commitment calculation
+                let commitments = document.querySelectorAll(".commitment-calc");
+                let totalCommitments = 0;
+                commitments.forEach(input => {
+                    totalCommitments += parseFloat(input.value) || 0;
+                });
+                document.getElementById("total-commitments-display").innerText = "LKR" + totalCommitments.toLocaleString();
+
                 // Expense calculation
                 let expenses = document.querySelectorAll(".expense-calc");
                 let totalExpenses = 0;
@@ -439,6 +471,10 @@
     @endpush
 
     <style>
+        .progress-bar {
+            transition: width 0.4s ease-in-out;
+        }
+
         .step-indicator {
             position: relative;
             color: #adb5bd;

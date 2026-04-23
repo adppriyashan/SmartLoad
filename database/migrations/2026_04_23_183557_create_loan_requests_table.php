@@ -24,16 +24,13 @@ return new class extends Migration
             $table->string('employment_status');
             $table->decimal('basic_salary', 15, 2);
             $table->decimal('gross_salary', 15, 2);
-            $table->json('other_incomes')->nullable();
 
             // Step 3: Financial Situation
             $table->integer('active_loans_count')->default(0);
-            $table->json('financial_commitments')->nullable();
-            $table->json('personal_expenses')->nullable();
 
             // Step 4: Required Uploads
             $table->string('nic_copy')->nullable();
-            $table->json('salary_slips')->nullable(); // Multiple slips
+            $table->json('salary_slips')->nullable(); // Still JSON as it's just paths
             $table->string('bank_statement')->nullable();
             $table->string('employment_letter')->nullable();
             $table->json('optional_uploads')->nullable();
