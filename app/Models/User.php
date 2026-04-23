@@ -11,16 +11,16 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 #[Fillable([
-    'name', 
-    'email', 
-    'password', 
-    'customer_name', 
-    'image', 
-    'nic', 
-    'address', 
-    'tel', 
-    'dob', 
-    'job', 
+    'name',
+    'email',
+    'password',
+    'customer_name',
+    'image',
+    'nic',
+    'address',
+    'tel',
+    'dob',
+    'job',
     'role',
     'is_profile_complete'
 ])]
@@ -43,5 +43,15 @@ class User extends Authenticatable
             'dob' => 'date',
             'is_profile_complete' => 'boolean',
         ];
+    }
+
+    /**
+     * Get the user's age.
+     *
+     * @return int|null
+     */
+    public function getAgeAttribute()
+    {
+        return $this->dob ? $this->dob->age : null;
     }
 }

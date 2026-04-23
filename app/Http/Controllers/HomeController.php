@@ -35,9 +35,6 @@ class HomeController extends Controller implements HasMiddleware
      */
     public function index()
     {
-        if (auth()->user()->role === 'admin') {
-            return redirect()->route('admin.dashboard');
-        }
-        return view('home');
+        return redirect()->route('admin.dashboard');
     }
 }
