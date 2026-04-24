@@ -13,7 +13,9 @@
                         </div>
                         <div class="col-md-4 text-end">
                             @if($loan->status == 'Verified')
-                                <span class="badge badge-sm bg-gradient-success">Verified</span>
+                                <span class="badge badge-sm bg-gradient-info">Verified</span>
+                            @elseif($loan->status == 'Approved')
+                                <span class="badge badge-sm bg-gradient-success">Approved</span>
                             @elseif($loan->status == 'Rejected')
                                 <span class="badge badge-sm bg-gradient-danger">Rejected</span>
                             @elseif($loan->status == 'In Progress')
@@ -34,6 +36,7 @@
                                     <select name="status" class="form-select form-select-sm me-2" style="width: 150px;">
                                         <option value="In Progress" {{ $loan->status == 'In Progress' ? 'selected' : '' }}>In Progress</option>
                                         <option value="Verified" {{ $loan->status == 'Verified' ? 'selected' : '' }}>Verified</option>
+                                        <option value="Approved" {{ $loan->status == 'Approved' ? 'selected' : '' }}>Approved</option>
                                         <option value="Rejected" {{ $loan->status == 'Rejected' ? 'selected' : '' }}>Rejected</option>
                                     </select>
                                     <button type="submit" class="btn btn-sm bg-gradient-dark mb-0">Update</button>
@@ -113,15 +116,21 @@
                         </div>
                     @endif
                     <div class="row">
-                        <div class="col-md-4 text-center">
+                        <div class="col-md-3 text-center border-end">
                             <h2 class="font-weight-bolder text-dark mb-0">LKR {{ number_format($loan->loan_amount, 2) }}</h2>
                             <p class="text-xs text-secondary text-uppercase font-weight-bold">Amount Requested</p>
                         </div>
-                        <div class="col-md-4 text-center">
+                        @if($loan->possible_loan_amount)
+                        <div class="col-md-3 text-center border-end">
+                            <h2 class="font-weight-bolder text-success mb-0">LKR {{ number_format($loan->possible_loan_amount, 2) }}</h2>
+                            <p class="text-xs text-success text-uppercase font-weight-bold">Approved Amount</p>
+                        </div>
+                        @endif
+                        <div class="col-md-{{ $loan->possible_loan_amount ? '3' : '4' }} text-center {{ $loan->possible_loan_amount ? 'border-end' : '' }}">
                             <h4 class="font-weight-bolder text-dark mb-0">{{ $loan->loan_tenure }}</h4>
                             <p class="text-xs text-secondary text-uppercase font-weight-bold">Tenure</p>
                         </div>
-                        <div class="col-md-4 text-center">
+                        <div class="col-md-{{ $loan->possible_loan_amount ? '3' : '4' }} text-center">
                             <h4 class="font-weight-bolder text-dark mb-0">{{ $loan->created_at->format('M d, Y') }}</h4>
                             <p class="text-xs text-secondary text-uppercase font-weight-bold">Applied Date</p>
                         </div>

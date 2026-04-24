@@ -13,6 +13,7 @@ class LoanRequest extends Model
         'user_id',
         'loan_type',
         'loan_amount',
+        'possible_loan_amount',
         'loan_tenure',
         'employment_status',
         'basic_salary',

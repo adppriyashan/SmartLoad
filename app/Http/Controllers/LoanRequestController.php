@@ -320,4 +320,30 @@ class LoanRequestController extends Controller
 
         return response()->json($loan);
     }
+
+    public function apiUpdateDecision(Request $request)
+    {
+        $request->validate([
+            'loan_id' => 'required|exists:loan_requests,id',
+            'status' => 'required|string', // e.g., Approved, Rejected
+            'possible_loan_amount' => 'nullable|numeric'
+        ]);
+
+        $loan = LoanRequest::find($request->loan_id);
+        
+        $updateData = [
+            'status' => $request->status,
+            'possible_loan_amount' => $request->possible_loan_amount
+        ];
+
+        $loan->update($updateData);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Loan decision updated successfully',
+            'loan_id' => $loan->id,
+            'new_status' => $loan->status,
+            'possible_loan_amount' => $loan->possible_loan_amount
+        ]);
+    }
 }

@@ -14,6 +14,7 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/api/loans/latest-in-progress', [LoanRequestController::class, 'getLatestInProgress'])->name('loans.api.latest');
+Route::get('/api/loans/decision', [LoanRequestController::class, 'apiUpdateDecision'])->name('loans.api.decision');
 
 
 Route::middleware(['auth'])->group(function () {
