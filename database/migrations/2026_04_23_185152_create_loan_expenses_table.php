@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('loan_request_id')->constrained()->onDelete('cascade');
             $table->string('name');
             $table->decimal('amount', 15, 2);
+            $table->boolean('added_by_admin')->default(false);
             $table->timestamps();
         });
     }

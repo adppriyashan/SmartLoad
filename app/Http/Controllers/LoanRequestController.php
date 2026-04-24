@@ -25,7 +25,7 @@ class LoanRequestController extends Controller
 
         // Search by NIC (Join with users table)
         if ($request->filled('nic')) {
-            $query->whereHas('user', function($q) use ($request) {
+            $query->whereHas('user', function ($q) use ($request) {
                 $q->where('nic', 'like', '%' . $request->nic . '%');
             });
         }
@@ -106,10 +106,15 @@ class LoanRequestController extends Controller
         ]);
 
         $data = $request->only([
-            'loan_type', 'loan_amount', 'loan_tenure', 'employment_status', 
-            'basic_salary', 'gross_salary', 'active_loans_count'
+            'loan_type',
+            'loan_amount',
+            'loan_tenure',
+            'employment_status',
+            'basic_salary',
+            'gross_salary',
+            'active_loans_count'
         ]);
-        
+
         $data['user_id'] = Auth::id();
 
         // File uploads
@@ -223,35 +228,68 @@ class LoanRequestController extends Controller
         $loan->update([
             'purposed_loan_rental' => $request->purposed_loan_rental,
             'past_default_loan' => $request->past_default_loan,
-            'status' => 'Edited By Administrator'
         ]);
 
-        // Sync Commitments
-        $loan->commitments()->delete();
+        // Smart Update Commitments
+        $existingCommitments = $loan->commitments;
+        $keptCommitmentIds = [];
+
         if ($request->financial_commitments) {
-            foreach ($request->financial_commitments as $commitment) {
-                if (!empty($commitment['name']) && !empty($commitment['amount'])) {
-                    $loan->commitments()->create([
-                        'name' => $commitment['name'],
-                        'amount' => $commitment['amount']
-                    ]);
+            foreach ($request->financial_commitments as $item) {
+                if (!empty($item['name']) && !empty($item['amount'])) {
+                    // Check if an identical record already exists
+                    $match = $existingCommitments->where('name', $item['name'])
+                        ->where('amount', $item['amount'])
+                        ->first();
+
+                    if ($match) {
+                        // Keep the original record
+                        $keptCommitmentIds[] = $match->id;
+                    } else {
+                        // Create new flagged record
+                        $newRecord = $loan->commitments()->create([
+                            'name' => $item['name'],
+                            'amount' => $item['amount'],
+                            'added_by_admin' => true
+                        ]);
+                        $keptCommitmentIds[] = $newRecord->id;
+                    }
                 }
             }
         }
+        // Remove any records that are no longer in the list
+        $loan->commitments()->whereNotIn('id', $keptCommitmentIds)->delete();
 
-        // Sync Expenses
-        $loan->expenses()->delete();
+        // Smart Update Expenses
+        $existingExpenses = $loan->expenses;
+        $keptExpenseIds = [];
+
         if ($request->personal_expenses) {
-            foreach ($request->personal_expenses as $expense) {
-                if (!empty($expense['name']) && !empty($expense['amount'])) {
-                    $loan->expenses()->create([
-                        'name' => $expense['name'],
-                        'amount' => $expense['amount']
-                    ]);
+            foreach ($request->personal_expenses as $item) {
+                if (!empty($item['name']) && !empty($item['amount'])) {
+                    // Check if an identical record already exists
+                    $match = $existingExpenses->where('name', $item['name'])
+                        ->where('amount', $item['amount'])
+                        ->first();
+
+                    if ($match) {
+                        // Keep the original record
+                        $keptExpenseIds[] = $match->id;
+                    } else {
+                        // Create new flagged record
+                        $newRecord = $loan->expenses()->create([
+                            'name' => $item['name'],
+                            'amount' => $item['amount'],
+                            'added_by_admin' => true
+                        ]);
+                        $keptExpenseIds[] = $newRecord->id;
+                    }
                 }
             }
         }
+        // Remove any records that are no longer in the list
+        $loan->expenses()->whereNotIn('id', $keptExpenseIds)->delete();
 
-        return redirect()->back()->with('success', 'Loan financials updated and status changed to Edited By Administrator.');
+        return redirect()->back()->with('success', 'Loan financials updated. Only new or modified entries are flagged as Admin Edits.');
     }
 }

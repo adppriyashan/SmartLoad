@@ -18,8 +18,6 @@
                                 <span class="badge badge-sm bg-gradient-danger">Rejected</span>
                             @elseif($loan->status == 'In Progress')
                                 <span class="badge badge-sm bg-gradient-warning">In Progress</span>
-                            @elseif($loan->status == 'Edited By Administrator')
-                                <span class="badge badge-sm bg-gradient-secondary">Edited By Admin</span>
                             @else
                                 <span class="badge badge-sm bg-gradient-info">Under Verification</span>
                             @endif
@@ -173,9 +171,14 @@
                         <div class="col-md-6">
                             <h6 class="text-xs text-uppercase font-weight-bold text-secondary mb-3">Commitments</h6>
                             @forelse($loan->commitments as $commitment)
-                            <div class="d-flex align-items-center mb-2">
-                                <i class="fas fa-minus-circle text-danger me-2"></i>
-                                <span class="text-sm">{{ $commitment->name }}: LKR {{ number_format($commitment->amount, 2) }}</span>
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-minus-circle text-danger me-2"></i>
+                                    <span class="text-sm">{{ $commitment->name }}: LKR {{ number_format($commitment->amount, 2) }}</span>
+                                </div>
+                                @if($commitment->added_by_admin)
+                                    <span class="badge badge-xxs bg-gradient-secondary ms-2" style="font-size: 0.6rem;">Admin Edit</span>
+                                @endif
                             </div>
                             @empty
                             <p class="text-xs text-secondary">No active commitments listed.</p>
@@ -184,9 +187,14 @@
                         <div class="col-md-6">
                             <h6 class="text-xs text-uppercase font-weight-bold text-secondary mb-3">Living Expenses</h6>
                             @forelse($loan->expenses as $expense)
-                            <div class="d-flex align-items-center mb-2">
-                                <i class="fas fa-shopping-cart text-warning me-2"></i>
-                                <span class="text-sm">{{ $expense->name }}: LKR {{ number_format($expense->amount, 2) }}</span>
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-shopping-cart text-warning me-2"></i>
+                                    <span class="text-sm">{{ $expense->name }}: LKR {{ number_format($expense->amount, 2) }}</span>
+                                </div>
+                                @if($expense->added_by_admin)
+                                    <span class="badge badge-xxs bg-gradient-secondary ms-2" style="font-size: 0.6rem;">Admin Edit</span>
+                                @endif
                             </div>
                             @empty
                             <p class="text-xs text-secondary">No specific expenses listed.</p>

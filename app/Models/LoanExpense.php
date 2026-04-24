@@ -2,14 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class LoanExpense extends Model
 {
-    use HasFactory;
-
-    protected $fillable = ['loan_request_id', 'name', 'amount'];
+    protected $fillable = ['loan_request_id', 'name', 'amount', 'added_by_admin'];
 
     public function loanRequest()
     {
