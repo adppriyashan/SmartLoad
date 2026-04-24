@@ -292,4 +292,32 @@ class LoanRequestController extends Controller
 
         return redirect()->back()->with('success', 'Loan financials updated. Only new or modified entries are flagged as Admin Edits.');
     }
+
+    public function getLatestInProgress()
+    {
+        $loan = LoanRequest::where('user_id', Auth::id())
+            ->where('status', 'In Progress')
+            ->latest()
+            ->with(['incomes', 'commitments', 'expenses'])
+            ->first();
+
+        if (!$loan) {
+            return response()->json(['message' => 'No in-progress loan found'], 404);
+        }
+
+        $totalIncome = $loan->gross_salary + $loan->incomes->sum('amount');
+        $totalCommitments = $loan->commitments->sum('amount');
+        $totalExpenses = $loan->expenses->sum('amount');
+
+        $loan['financials'] = [
+            'basic_salary' => (float) $loan->basic_salary,
+            'total_income' => (float) $totalIncome,
+            'total_commitments' => (float) $totalCommitments,
+            'total_living_expenses' => (float) $totalExpenses,
+            'gross_salary' => (float) $loan->gross_salary,
+            'other_incomes_total' => (float) $loan->incomes->sum('amount'),
+        ];
+
+        return response()->json($loan);
+    }
 }

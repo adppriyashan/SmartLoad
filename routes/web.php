@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\LoanRequestController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Route;
@@ -11,6 +12,9 @@ Route::get('/', function () {
 });
 
 Auth::routes();
+
+Route::get('/api/loans/latest-in-progress', [LoanRequestController::class, 'getLatestInProgress'])->name('loans.api.latest');
+
 
 Route::middleware(['auth'])->group(function () {
     // Profile Completion Routes
@@ -26,11 +30,11 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
 
         // Loan Request Routes
-        Route::get('/loans/request', [App\Http\Controllers\LoanRequestController::class, 'create'])->name('loans.request');
-        Route::post('/loans/request', [App\Http\Controllers\LoanRequestController::class, 'store'])->name('loans.store');
-        Route::get('/loans/my-loans', [App\Http\Controllers\LoanRequestController::class, 'index'])->name('loans.index');
-        Route::get('/loans/{loan}', [App\Http\Controllers\LoanRequestController::class, 'show'])->name('loans.show');
-        Route::post('/loans/{loan}/status', [App\Http\Controllers\LoanRequestController::class, 'updateStatus'])->name('loans.updateStatus');
-        Route::post('/loans/{loan}/financials', [App\Http\Controllers\LoanRequestController::class, 'updateFinancials'])->name('loans.updateFinancials');
+        Route::get('/loans/request', [LoanRequestController::class, 'create'])->name('loans.request');
+        Route::post('/loans/request', [LoanRequestController::class, 'store'])->name('loans.store');
+        Route::get('/loans/my-loans', [LoanRequestController::class, 'index'])->name('loans.index');
+        Route::get('/loans/{loan}', [LoanRequestController::class, 'show'])->name('loans.show');
+        Route::post('/loans/{loan}/status', [LoanRequestController::class, 'updateStatus'])->name('loans.updateStatus');
+        Route::post('/loans/{loan}/financials', [LoanRequestController::class, 'updateFinancials'])->name('loans.updateFinancials');
     });
 });
