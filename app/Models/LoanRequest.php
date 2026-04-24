@@ -17,6 +17,8 @@ class LoanRequest extends Model
         'employment_status',
         'basic_salary',
         'gross_salary',
+        'purposed_loan_rental',
+        'past_default_loan',
         'active_loans_count',
         'nic_copy',
         'salary_slips',

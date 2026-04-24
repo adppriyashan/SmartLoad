@@ -203,4 +203,55 @@ class LoanRequestController extends Controller
 
         return redirect()->route('loans.index')->with('status', 'Loan request submitted for verification!');
     }
+
+    public function updateFinancials(Request $request, LoanRequest $loan)
+    {
+        if (Auth::user()->role !== 'admin') {
+            abort(403);
+        }
+
+        $request->validate([
+            'purposed_loan_rental' => 'nullable|numeric',
+            'past_default_loan' => 'nullable|string',
+            'financial_commitments.*.name' => 'required|string',
+            'financial_commitments.*.amount' => 'required|numeric',
+            'personal_expenses.*.name' => 'required|string',
+            'personal_expenses.*.amount' => 'required|numeric',
+        ]);
+
+        // Update basic fields
+        $loan->update([
+            'purposed_loan_rental' => $request->purposed_loan_rental,
+            'past_default_loan' => $request->past_default_loan,
+            'status' => 'Edited By Administrator'
+        ]);
+
+        // Sync Commitments
+        $loan->commitments()->delete();
+        if ($request->financial_commitments) {
+            foreach ($request->financial_commitments as $commitment) {
+                if (!empty($commitment['name']) && !empty($commitment['amount'])) {
+                    $loan->commitments()->create([
+                        'name' => $commitment['name'],
+                        'amount' => $commitment['amount']
+                    ]);
+                }
+            }
+        }
+
+        // Sync Expenses
+        $loan->expenses()->delete();
+        if ($request->personal_expenses) {
+            foreach ($request->personal_expenses as $expense) {
+                if (!empty($expense['name']) && !empty($expense['amount'])) {
+                    $loan->expenses()->create([
+                        'name' => $expense['name'],
+                        'amount' => $expense['amount']
+                    ]);
+                }
+            }
+        }
+
+        return redirect()->back()->with('success', 'Loan financials updated and status changed to Edited By Administrator.');
+    }
 }

@@ -25,6 +25,9 @@ return new class extends Migration
             $table->decimal('basic_salary', 15, 2);
             $table->decimal('gross_salary', 15, 2);
 
+            $table->decimal('purposed_loan_rental', 15, 2)->nullable();
+            $table->text('past_default_loan')->nullable();
+            
             // Step 3: Financial Situation
             $table->integer('active_loans_count')->default(0);
 
@@ -36,7 +39,7 @@ return new class extends Migration
             $table->json('optional_uploads')->nullable();
 
             $table->string('status')->default('Submitted for verification');
-            $table->timestamps();
+            $table->timestamps(); 
         });
     }
 

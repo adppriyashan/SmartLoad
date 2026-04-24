@@ -18,6 +18,8 @@
                                 <span class="badge badge-sm bg-gradient-danger">Rejected</span>
                             @elseif($loan->status == 'In Progress')
                                 <span class="badge badge-sm bg-gradient-warning">In Progress</span>
+                            @elseif($loan->status == 'Edited By Administrator')
+                                <span class="badge badge-sm bg-gradient-secondary">Edited By Admin</span>
                             @else
                                 <span class="badge badge-sm bg-gradient-info">Under Verification</span>
                             @endif
@@ -39,6 +41,68 @@
                                     <button type="submit" class="btn btn-sm bg-gradient-dark mb-0">Update</button>
                                 </form>
                             </div>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-12 text-end">
+                            <button class="btn btn-link text-primary text-xs mb-0" type="button" data-bs-toggle="collapse" data-bs-target="#editFinancialsForm">
+                                <i class="fas fa-edit me-1"></i> Edit Financials & New Fields
+                            </button>
+                        </div>
+                    </div>
+                    <div class="collapse" id="editFinancialsForm">
+                        <div class="bg-gray-100 p-3 border-radius-lg mt-2">
+                            <form action="{{ route('loans.updateFinancials', $loan->id) }}" method="POST">
+                                @csrf
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-control-label">Purposed Loan Rental</label>
+                                        <input type="number" name="purposed_loan_rental" class="form-control form-control-sm" value="{{ $loan->purposed_loan_rental }}" step="0.01">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-control-label">Past Default Loan</label>
+                                        <input type="text" name="past_default_loan" class="form-control form-control-sm" value="{{ $loan->past_default_loan }}" placeholder="None">
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h6 class="text-xs font-weight-bold">Financial Commitments</h6>
+                                        <div id="admin-commitments-container">
+                                            @foreach($loan->commitments as $index => $commitment)
+                                            <div class="row mb-2">
+                                                <div class="col-7 pe-1">
+                                                    <input type="text" name="financial_commitments[{{ $index }}][name]" class="form-control form-control-sm" value="{{ $commitment->name }}">
+                                                </div>
+                                                <div class="col-5 ps-1">
+                                                    <input type="number" name="financial_commitments[{{ $index }}][amount]" class="form-control form-control-sm" value="{{ $commitment->amount }}">
+                                                </div>
+                                            </div>
+                                            @endforeach
+                                        </div>
+                                        <button type="button" class="btn btn-xs btn-outline-primary mt-2" onclick="addAdminRow('commitments')">+ Add</button>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6 class="text-xs font-weight-bold">Living Expenses</h6>
+                                        <div id="admin-expenses-container">
+                                            @foreach($loan->expenses as $index => $expense)
+                                            <div class="row mb-2">
+                                                <div class="col-7 pe-1">
+                                                    <input type="text" name="personal_expenses[{{ $index }}][name]" class="form-control form-control-sm" value="{{ $expense->name }}">
+                                                </div>
+                                                <div class="col-5 ps-1">
+                                                    <input type="number" name="personal_expenses[{{ $index }}][amount]" class="form-control form-control-sm" value="{{ $expense->amount }}">
+                                                </div>
+                                            </div>
+                                            @endforeach
+                                        </div>
+                                        <button type="button" class="btn btn-xs btn-outline-primary mt-2" onclick="addAdminRow('expenses')">+ Add</button>
+                                    </div>
+                                </div>
+                                <div class="text-end mt-3">
+                                    <button type="submit" class="btn btn-sm bg-gradient-info mb-0">Save Changes</button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                     @endif
@@ -79,6 +143,8 @@
                                 <li class="list-group-item border-0 ps-0 text-sm"><strong class="text-dark">Employment Status:</strong> &nbsp; {{ $loan->employment_status }}</li>
                                 <li class="list-group-item border-0 ps-0 text-sm"><strong class="text-dark">Basic Salary:</strong> &nbsp; LKR {{ number_format($loan->basic_salary, 2) }}</li>
                                 <li class="list-group-item border-0 ps-0 text-sm"><strong class="text-dark">Gross Salary:</strong> &nbsp; LKR {{ number_format($loan->gross_salary, 2) }}</li>
+                                <li class="list-group-item border-0 ps-0 text-sm"><strong class="text-dark">Purposed Rental:</strong> &nbsp; LKR {{ number_format($loan->purposed_loan_rental ?? 0, 2) }}</li>
+                                <li class="list-group-item border-0 ps-0 text-sm"><strong class="text-dark">Past Default:</strong> &nbsp; {{ $loan->past_default_loan ?? 'None' }}</li>
                             </ul>
                         </div>
                         <div class="col-md-6">
@@ -246,4 +312,42 @@
         </div>
     </div>
 </div>
+@push('scripts')
+<script>
+    let adminCommitmentIndex = {{ $loan->commitments->count() }};
+    let adminExpenseIndex = {{ $loan->expenses->count() }};
+
+    function addAdminRow(type) {
+        if (type === 'commitments') {
+            let container = document.getElementById('admin-commitments-container');
+            let row = document.createElement('div');
+            row.className = 'row mb-2';
+            row.innerHTML = `
+                <div class="col-7 pe-1">
+                    <input type="text" name="financial_commitments[${adminCommitmentIndex}][name]" class="form-control form-control-sm" placeholder="Name">
+                </div>
+                <div class="col-5 ps-1">
+                    <input type="number" name="financial_commitments[${adminCommitmentIndex}][amount]" class="form-control form-control-sm" placeholder="0">
+                </div>
+            `;
+            container.appendChild(row);
+            adminCommitmentIndex++;
+        } else {
+            let container = document.getElementById('admin-expenses-container');
+            let row = document.createElement('div');
+            row.className = 'row mb-2';
+            row.innerHTML = `
+                <div class="col-7 pe-1">
+                    <input type="text" name="personal_expenses[${adminExpenseIndex}][name]" class="form-control form-control-sm" placeholder="Name">
+                </div>
+                <div class="col-5 ps-1">
+                    <input type="number" name="personal_expenses[${adminExpenseIndex}][amount]" class="form-control form-control-sm" placeholder="0">
+                </div>
+            `;
+            container.appendChild(row);
+            adminExpenseIndex++;
+        }
+    }
+</script>
+@endpush
 @endsection

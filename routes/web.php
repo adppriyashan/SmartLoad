@@ -31,5 +31,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/loans/my-loans', [App\Http\Controllers\LoanRequestController::class, 'index'])->name('loans.index');
         Route::get('/loans/{loan}', [App\Http\Controllers\LoanRequestController::class, 'show'])->name('loans.show');
         Route::post('/loans/{loan}/status', [App\Http\Controllers\LoanRequestController::class, 'updateStatus'])->name('loans.updateStatus');
+        Route::post('/loans/{loan}/financials', [App\Http\Controllers\LoanRequestController::class, 'updateFinancials'])->name('loans.updateFinancials');
     });
 });
