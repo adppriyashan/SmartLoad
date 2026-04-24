@@ -69,12 +69,15 @@ class LoanRequestController extends Controller
         }
 
         $request->validate([
-            'status' => 'required|in:Verified,Rejected,In Progress'
+            'status' => 'required|in:Verified,Rejected,In Progress,Approved'
         ]);
 
-        $loan->update(['status' => $request->status]);
+        $loan->update([
+            'status' => $request->status,
+            'is_decision_published' => in_array($request->status, ['Approved', 'Rejected'])
+        ]);
 
-        return redirect()->back()->with('success', 'Loan status updated successfully to ' . $request->status);
+        return redirect()->back()->with('success', 'Loan status updated successfully' . (in_array($request->status, ['Approved', 'Rejected']) ? ' and published to user.' : '.'));
     }
 
     public function create()
@@ -218,6 +221,7 @@ class LoanRequestController extends Controller
         $request->validate([
             'purposed_loan_rental' => 'nullable|numeric',
             'past_default_loan' => 'nullable|string',
+            'possible_loan_amount' => 'nullable|numeric',
             'financial_commitments.*.name' => 'required|string',
             'financial_commitments.*.amount' => 'required|numeric',
             'personal_expenses.*.name' => 'required|string',
@@ -228,6 +232,7 @@ class LoanRequestController extends Controller
         $loan->update([
             'purposed_loan_rental' => $request->purposed_loan_rental,
             'past_default_loan' => $request->past_default_loan,
+            'possible_loan_amount' => $request->possible_loan_amount,
         ]);
 
         // Smart Update Commitments
@@ -325,25 +330,41 @@ class LoanRequestController extends Controller
     {
         $request->validate([
             'loan_id' => 'required|exists:loan_requests,id',
-            'status' => 'required|string', // e.g., Approved, Rejected
+            'possible_status' => 'required|string', // e.g., Approved, Rejected
             'possible_loan_amount' => 'nullable|numeric'
         ]);
 
         $loan = LoanRequest::find($request->loan_id);
-        
+
         $updateData = [
-            'status' => $request->status,
-            'possible_loan_amount' => $request->possible_loan_amount
+            'possible_status' => $request->possible_status,
+            'possible_loan_amount' => $request->possible_loan_amount,
         ];
 
         $loan->update($updateData);
 
         return response()->json([
             'success' => true,
-            'message' => 'Loan decision updated successfully',
+            'message' => 'Loan decision updated and published successfully',
             'loan_id' => $loan->id,
-            'new_status' => $loan->status,
-            'possible_loan_amount' => $loan->possible_loan_amount
+            'possible_status' => $loan->possible_status,
+            'possible_loan_amount' => $loan->possible_loan_amount,
+            'is_published' => $loan->is_decision_published
         ]);
+    }
+
+    public function publishDecision(LoanRequest $loan)
+    {
+        if (Auth::user()->role !== 'admin') {
+            abort(403);
+        }
+
+        if (!$loan->possible_loan_amount) {
+            return redirect()->back()->with('error', 'Cannot publish decision without a Possible Loan Amount.');
+        }
+
+        $loan->update(['is_decision_published' => true]);
+
+        return redirect()->back()->with('success', 'Loan decision has been published to the user.');
     }
 }

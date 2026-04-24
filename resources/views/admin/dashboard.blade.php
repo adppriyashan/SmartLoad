@@ -8,10 +8,9 @@
                 <div class="row">
                     <div class="col-8">
                         <div class="numbers">
-                            <p class="text-sm mb-0 text-capitalize font-weight-bold">Today's Money</p>
+                            <p class="text-sm mb-0 text-capitalize font-weight-bold">Total Requested</p>
                             <h5 class="font-weight-bolder mb-0">
-                                $53,000
-                                <span class="text-success text-sm font-weight-bolder">+55%</span>
+                                LKR {{ number_format($stats['total_amount'], 2) }}
                             </h5>
                         </div>
                     </div>
@@ -30,10 +29,9 @@
                 <div class="row">
                     <div class="col-8">
                         <div class="numbers">
-                            <p class="text-sm mb-0 text-capitalize font-weight-bold">Today's Users</p>
+                            <p class="text-sm mb-0 text-capitalize font-weight-bold">Total Applications</p>
                             <h5 class="font-weight-bolder mb-0">
-                                2,300
-                                <span class="text-success text-sm font-weight-bolder">+3%</span>
+                                {{ $stats['total_loans'] }}
                             </h5>
                         </div>
                     </div>
@@ -52,10 +50,9 @@
                 <div class="row">
                     <div class="col-8">
                         <div class="numbers">
-                            <p class="text-sm mb-0 text-capitalize font-weight-bold">New Clients</p>
+                            <p class="text-sm mb-0 text-capitalize font-weight-bold">Pending Review</p>
                             <h5 class="font-weight-bolder mb-0">
-                                +3,462
-                                <span class="text-danger text-sm font-weight-bolder">-2%</span>
+                                {{ $stats['pending_loans'] }}
                             </h5>
                         </div>
                     </div>
@@ -74,10 +71,9 @@
                 <div class="row">
                     <div class="col-8">
                         <div class="numbers">
-                            <p class="text-sm mb-0 text-capitalize font-weight-bold">Sales</p>
+                            <p class="text-sm mb-0 text-capitalize font-weight-bold">Approved Loans</p>
                             <h5 class="font-weight-bolder mb-0">
-                                $103,430
-                                <span class="text-success text-sm font-weight-bolder">+5%</span>
+                                {{ $stats['approved_loans'] }}
                             </h5>
                         </div>
                     </div>
@@ -146,10 +142,10 @@
             <div class="card-header pb-0">
                 <div class="row">
                     <div class="col-lg-6 col-7">
-                        <h6>Projects</h6>
+                        <h6>Recent Loan Requests</h6>
                         <p class="text-sm mb-0">
-                            <i class="fa fa-check text-info" aria-hidden="true"></i>
-                            <span class="font-weight-bold ms-1">30 done</span> this month
+                            <i class="fa fa-clock text-info" aria-hidden="true"></i>
+                            <span class="font-weight-bold ms-1">Latest 5</span> submissions
                         </p>
                     </div>
                 </div>
@@ -159,48 +155,42 @@
                     <table class="table align-items-center mb-0">
                         <thead>
                             <tr>
-                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Companies</th>
-                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Members</th>
-                                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Budget</th>
-                                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Completion</th>
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">User</th>
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Type</th>
+                                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Amount</th>
+                                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Status</th>
+                                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Action</th>
                             </tr>
                         </thead>
                         <tbody>
+                            @foreach($latestLoans as $loan)
                             <tr>
                                 <td>
                                     <div class="d-flex px-2 py-1">
-                                        <div>
-                                            <img src="https://demos.creative-tim.com/soft-ui-dashboard/assets/img/small-logos/logo-xd.svg" class="avatar avatar-sm me-3" alt="xd">
-                                        </div>
                                         <div class="d-flex flex-column justify-content-center">
-                                            <h6 class="mb-0 text-sm">Material XD Version</h6>
+                                            <h6 class="mb-0 text-sm">{{ $loan->user->name }}</h6>
+                                            <p class="text-xs text-secondary mb-0">{{ $loan->user->nic }}</p>
                                         </div>
                                     </div>
                                 </td>
                                 <td>
-                                    <div class="avatar-group mt-2">
-                                        <a href="javascript:;" class="avatar avatar-xs rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Ryan Tompson">
-                                            <img src="https://demos.creative-tim.com/soft-ui-dashboard/assets/img/team-1.jpg" alt="team1">
-                                        </a>
-                                    </div>
+                                    <p class="text-xs font-weight-bold mb-0">{{ $loan->loan_type }}</p>
                                 </td>
                                 <td class="align-middle text-center text-sm">
-                                    <span class="text-xs font-weight-bold"> $14,000 </span>
+                                    <span class="text-xs font-weight-bold"> LKR {{ number_format($loan->loan_amount, 2) }} </span>
                                 </td>
-                                <td class="align-middle">
-                                    <div class="progress-wrapper w-75 mx-auto">
-                                        <div class="progress-info">
-                                            <div class="progress-percentage">
-                                                <span class="text-xs font-weight-bold">60%</span>
-                                            </div>
-                                        </div>
-                                        <div class="progress">
-                                            <div class="progress-bar bg-gradient-info w-60" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </div>
+                                <td class="align-middle text-center">
+                                    <span class="badge badge-sm bg-gradient-{{ $loan->status == 'Approved' ? 'success' : ($loan->status == 'Rejected' ? 'danger' : 'warning') }}">
+                                        {{ $loan->status }}
+                                    </span>
+                                </td>
+                                <td class="align-middle text-center">
+                                    <a href="{{ route('loans.show', $loan->id) }}" class="text-secondary font-weight-bold text-xs" data-toggle="tooltip" data-original-title="View details">
+                                        View
+                                    </a>
                                 </td>
                             </tr>
-                            <!-- More rows -->
+                            @endforeach
                         </tbody>
                     </table>
                 </div>

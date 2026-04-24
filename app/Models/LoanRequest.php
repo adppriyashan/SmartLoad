@@ -14,6 +14,8 @@ class LoanRequest extends Model
         'loan_type',
         'loan_amount',
         'possible_loan_amount',
+        'possible_status',
+        'is_decision_published',
         'loan_tenure',
         'employment_status',
         'basic_salary',
@@ -33,6 +35,7 @@ class LoanRequest extends Model
         'salary_slips' => 'json',
         'bank_statements' => 'json',
         'optional_uploads' => 'json',
+        'is_decision_published' => 'boolean',
     ];
 
     public function user()
