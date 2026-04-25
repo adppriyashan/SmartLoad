@@ -102,12 +102,6 @@
                                                     class="form-control form-control-sm"
                                                     value="{{ $loan->past_default_loan }}" placeholder="None">
                                             </div>
-                                            <div class="col-md-4 mb-3">
-                                                <label class="form-control-label">Possible Loan Amount</label>
-                                                <input type="number" name="possible_loan_amount"
-                                                    class="form-control form-control-sm"
-                                                    value="{{ $loan->possible_loan_amount }}" step="0.01">
-                                            </div>
                                         </div>
 
                                         <div class="row">

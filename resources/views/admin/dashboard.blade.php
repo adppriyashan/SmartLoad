@@ -92,8 +92,8 @@
     <div class="col-lg-4 col-md-6 mb-4">
         <div class="card z-index-2">
             <div class="card-header pb-0">
-                <h6>Website Views</h6>
-                <p class="text-sm">Last Campaign Performance</p>
+                <h6>Loans by Type</h6>
+                <p class="text-sm">Distribution of application categories</p>
             </div>
             <div class="card-body p-3">
                 <div class="bg-gradient-dark border-radius-lg py-3 pe-1 mb-3">
@@ -101,16 +101,16 @@
                         <canvas id="chart-bars" class="chart-canvas" height="170"></canvas>
                     </div>
                 </div>
-                <h6 class="ms-2 mt-4 mb-0">Active Users</h6>
-                <p class="text-sm ms-2">(+23%) than last week</p>
+                <h6 class="ms-2 mt-4 mb-0">Total Varieties</h6>
+                <p class="text-sm ms-2">Types of loans requested</p>
             </div>
         </div>
     </div>
     <div class="col-lg-4 col-md-6 mb-4">
         <div class="card z-index-2">
             <div class="card-header pb-0">
-                <h6>Daily Sales</h6>
-                <p class="text-sm">(+15%) increase in today sales.</p>
+                <h6>Application Trends</h6>
+                <p class="text-sm">Monthly submission volume</p>
             </div>
             <div class="card-body p-3">
                 <div class="chart">
@@ -123,8 +123,8 @@
     <div class="col-lg-4 col-md-12 mb-4">
         <div class="card z-index-2">
             <div class="card-header pb-0">
-                <h6>Completed Tasks</h6>
-                <p class="text-sm">Last Campaign Performance</p>
+                <h6>Status Breakdown</h6>
+                <p class="text-sm">Current lifecycle distribution</p>
             </div>
             <div class="card-body p-3">
                 <div class="chart">
@@ -200,32 +200,37 @@
     <div class="col-lg-4 col-md-6">
         <div class="card h-100">
             <div class="card-header pb-0">
-                <h6>Orders overview</h6>
+                <h6>Loan Activity</h6>
                 <p class="text-sm">
                     <i class="fa fa-arrow-up text-success" aria-hidden="true"></i>
-                    <span class="font-weight-bold">24%</span> this month
+                    <span class="font-weight-bold">Recent</span> status updates
                 </p>
             </div>
             <div class="card-body p-3">
                 <div class="timeline timeline-one-side">
+                    @foreach($recentActivities as $activity)
                     <div class="timeline-block mb-3">
                         <span class="timeline-step">
-                            <i class="ni ni-bell-55 text-success text-gradient"></i>
+                            @if($activity->status == 'Approved')
+                                <i class="ni ni-check-bold text-success text-gradient"></i>
+                            @elseif($activity->status == 'Rejected')
+                                <i class="ni ni-fat-remove text-danger text-gradient"></i>
+                            @elseif($activity->status == 'In Progress')
+                                <i class="ni ni-settings-gear-65 text-info text-gradient"></i>
+                            @else
+                                <i class="ni ni-bell-55 text-warning text-gradient"></i>
+                            @endif
                         </span>
                         <div class="timeline-content">
-                            <h6 class="text-dark text-sm font-weight-bold mb-0">$2400, Design changes</h6>
-                            <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">22 DEC 7:20 PM</p>
+                            <h6 class="text-dark text-sm font-weight-bold mb-0">
+                                {{ $activity->user->name }} - {{ $activity->status }}
+                            </h6>
+                            <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">
+                                {{ $activity->loan_type }} | {{ $activity->updated_at->diffForHumans() }}
+                            </p>
                         </div>
                     </div>
-                    <div class="timeline-block mb-3">
-                        <span class="timeline-step">
-                            <i class="ni ni-html5 text-danger text-gradient"></i>
-                        </span>
-                        <div class="timeline-content">
-                            <h6 class="text-dark text-sm font-weight-bold mb-0">New order #1832412</h6>
-                            <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">21 DEC 11 PM</p>
-                        </div>
-                    </div>
+                    @endforeach
                 </div>
             </div>
         </div>
@@ -241,15 +246,15 @@
     new Chart(ctx, {
       type: "bar",
       data: {
-        labels: ["M", "T", "W", "T", "F", "S", "S"],
+        labels: {!! json_encode($loanTypes->pluck('loan_type')) !!},
         datasets: [{
-          label: "Sales",
+          label: "Applications",
           tension: 0.4,
           borderWidth: 0,
           borderRadius: 4,
           borderSkipped: false,
           backgroundColor: "#fff",
-          data: [450, 200, 100, 220, 500, 100, 400],
+          data: {!! json_encode($loanTypes->pluck('count')) !!},
           maxBarThickness: 6
         }, ],
       },
@@ -275,7 +280,6 @@
             },
             ticks: {
               suggestedMin: 0,
-              suggestedMax: 500,
               beginAtZero: true,
               padding: 15,
               font: {
@@ -295,7 +299,12 @@
               drawTicks: false
             },
             ticks: {
-              display: false
+                display: true,
+                color: "#fff",
+                font: {
+                    size: 11,
+                    family: "Open Sans",
+                }
             },
           },
         },
@@ -314,9 +323,9 @@
     new Chart(ctx2, {
       type: "line",
       data: {
-        labels: ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+        labels: ["-8m", "-7m", "-6m", "-5m", "-4m", "-3m", "-2m", "-1m", "Now"],
         datasets: [{
-            label: "Mobile apps",
+            label: "Applications",
             tension: 0.4,
             borderWidth: 0,
             pointRadius: 0,
@@ -324,7 +333,7 @@
             borderWidth: 3,
             backgroundColor: gradientStroke1,
             fill: true,
-            data: [50, 40, 300, 220, 500, 250, 400, 230, 500],
+            data: {!! json_encode($trendData) !!},
             maxBarThickness: 6
 
           }
@@ -392,9 +401,9 @@
     new Chart(ctx3, {
       type: "line",
       data: {
-        labels: ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+        labels: {!! json_encode(array_keys($statusCounts)) !!},
         datasets: [{
-            label: "Tasks",
+            label: "Count",
             tension: 0.4,
             borderWidth: 0,
             pointRadius: 0,
@@ -402,7 +411,7 @@
             borderWidth: 3,
             backgroundColor: "rgba(58,65,111,0.1)",
             fill: true,
-            data: [30, 90, 40, 140, 290, 290, 340, 230, 400],
+            data: {!! json_encode(array_values($statusCounts)) !!},
             maxBarThickness: 6
           }
         ],
