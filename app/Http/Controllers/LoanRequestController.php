@@ -300,8 +300,7 @@ class LoanRequestController extends Controller
 
     public function getLatestInProgress()
     {
-        $loan = LoanRequest::where('user_id', Auth::id())
-            ->where('status', 'In Progress')
+        $loan = LoanRequest::where('status', 'In Progress')
             ->latest()
             ->with(['incomes', 'commitments', 'expenses'])
             ->first();
