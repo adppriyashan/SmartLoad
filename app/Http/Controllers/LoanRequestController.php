@@ -10,6 +10,7 @@ use App\Models\LoanExpense;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class LoanRequestController extends Controller
 {
@@ -327,13 +328,27 @@ class LoanRequestController extends Controller
 
     public function apiUpdateDecision(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'loan_id' => 'required|exists:loan_requests,id',
-            'possible_status' => 'required|string', // e.g., Approved, Rejected
+            'possible_status' => 'required|string',
             'possible_loan_amount' => 'nullable|numeric'
         ]);
 
-        $loan = LoanRequest::find($request->loan_id);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first()
+            ]);
+        }
+
+        $loan = LoanRequest::where('id', $request->loan_id)->first();
+
+        if (!$loan) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Loan not found'
+            ]);
+        }
 
         $updateData = [
             'possible_status' => $request->possible_status,
